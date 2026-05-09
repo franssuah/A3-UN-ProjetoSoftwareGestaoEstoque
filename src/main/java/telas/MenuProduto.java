@@ -265,5 +265,111 @@ public class MenuProduto {
 
     public void excluir() {
 
-    }
-}
+    String novaExclusao;
+
+    do {
+
+        String nome = JOptionPane.showInputDialog(
+                "EXCLUSÃO DE PRODUTO\n\nDIGITE O NOME DO PRODUTO:"
+        );
+
+        if (nome == null) {
+            break;
+        }
+
+        boolean existe = false;
+
+        for (int i = 0; i < total; i++) {
+
+            if (produtos[i].nome.equalsIgnoreCase(nome)) {
+
+                Produto produto = produtos[i];
+
+                JOptionPane.showMessageDialog(null,
+                        "PRODUTO ENCONTRADO\n\n"
+                        + "Produto: " + produto.nome + "\n"
+                        + "Preço: R$ " + String.format("%.2f", produto.preco) + "\n"
+                        + "Unidade: " + produto.unidade + "\n"
+                        + "Quantidade em estoque: " + produto.quantidade
+                );
+
+                String quantidadeStr = JOptionPane.showInputDialog(
+                        "Quantos itens deseja excluir?"
+                );
+
+                if (quantidadeStr == null) {
+                    break;
+                }
+
+                int quantidadeExcluir = Integer.parseInt(quantidadeStr);
+
+                if (quantidadeExcluir <= 0) {
+
+                    JOptionPane.showMessageDialog(null,
+                            "Digite uma quantidade válida!");
+
+                } else if (quantidadeExcluir > produto.quantidade) {
+
+                    JOptionPane.showMessageDialog(null,
+                            "Quantidade maior que o estoque!");
+
+                } else {
+
+                    String confirma = JOptionPane.showInputDialog(
+                            "CONFIRMA EXCLUSÃO DE "
+                            + quantidadeExcluir
+                            + " UNIDADE(S)? (S/N)"
+                    );
+
+                    if (confirma != null && confirma.equalsIgnoreCase("S")) {
+
+                        // REMOVE APENAS UMA PARTE
+                        if (quantidadeExcluir < produto.quantidade) {
+
+                            produto.quantidade -= quantidadeExcluir;
+
+                            JOptionPane.showMessageDialog(null,
+                                    "Quantidade removida com sucesso!\n\n"
+                                    + "Estoque restante: "
+                                    + produto.quantidade
+                            );
+
+                        }
+
+                        // REMOVE O PRODUTO INTEIRO
+                        else {
+
+                            for (int j = i; j < total - 1; j++) {
+                                produtos[j] = produtos[j + 1];
+                            }
+
+                            total--;
+
+                            JOptionPane.showMessageDialog(null,
+                                    "Produto removido completamente!");
+                        }
+                    }
+                }
+
+                existe = true;
+                break;
+            }
+        }
+
+        if (!existe) {
+
+            JOptionPane.showMessageDialog(null,
+                    "Produto não encontrado!");
+
+        }
+
+        novaExclusao = JOptionPane.showInputDialog(
+                "DESEJA FAZER UMA NOVA EXCLUSÃO? (S/N)"
+        );
+
+        if (novaExclusao == null) {
+            break;
+        }
+
+    } while (novaExclusao.equalsIgnoreCase("S"));
+}}
