@@ -3,6 +3,7 @@ package app;
 import javax.swing.*;
 import telas.MenuProduto;
 import telas.MenuReajustePreco;
+import telas.MenuRelatorio;
 
 public class Main {
 
@@ -34,7 +35,7 @@ public class Main {
                     new MenuReajustePreco(menuProduto.produtos, menuProduto.total).menu();
                     break;
                 case "4":
-                    JOptionPane.showMessageDialog(null, "Em desenvolvimento...");
+                    new MenuRelatorio(menuProduto.produtos, menuProduto.total).menu();
                     break;
                 case "0":
                     break;
