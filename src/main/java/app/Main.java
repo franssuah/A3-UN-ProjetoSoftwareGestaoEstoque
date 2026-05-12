@@ -1,6 +1,8 @@
 package app;
 
 import javax.swing.*;
+
+import telas.MenuMovimentacao;
 import telas.MenuProduto;
 import telas.MenuReajustePreco;
 import telas.MenuRelatorio;
@@ -10,6 +12,7 @@ public class Main {
     public static void main(String[] args) {
 
         MenuProduto menuProduto = new MenuProduto();
+        MenuMovimentacao menuMovimentacao = new MenuMovimentacao();
 
         String opcao;
 
@@ -29,7 +32,7 @@ public class Main {
                     menuProduto.menu();
                     break;
                 case "2":
-                    JOptionPane.showMessageDialog(null, "Em desenvolvimento...");
+                   menuMovimentacao.menu();
                     break;
                 case "3":
                     new MenuReajustePreco(menuProduto.produtos, menuProduto.total).menu();
