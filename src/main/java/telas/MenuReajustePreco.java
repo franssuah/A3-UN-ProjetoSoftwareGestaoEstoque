@@ -1,7 +1,7 @@
-package telas;
+package telas;       // Define que esta classe pertence ao pacote "telas"
 
-import modelo.Produto;
-import javax.swing.JOptionPane;
+import modelo.Produto;                 // Importa a classe Produto do pacote modelo
+import javax.swing.JOptionPane;        // Importa o JOptionPane para criar janelas de diálogo
 
 public class MenuReajustePreco {
 
