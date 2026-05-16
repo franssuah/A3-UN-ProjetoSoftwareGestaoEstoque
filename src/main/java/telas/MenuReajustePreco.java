@@ -1,46 +1,30 @@
-package telas;                          // Define que esta classe pertence ao pacote "telas"
+package telas;
 
-import modelo.Produto;                  // Importa a classe Produto do pacote modelo
-import javax.swing.JOptionPane;         // Importa o JOptionPane para criar janelas de diálogo
+import modelo.Produto;
+import javax.swing.JOptionPane;
 
-/**
- * Tela responsável pelo reajuste de preços dos produtos. Recebe o array de
- * produtos e o total cadastrado do MenuProduto, garantindo que ambos trabalhem
- * com os mesmos dados.
- */
 public class MenuReajustePreco {
 
-    // ─── ATRIBUTOS ────────────────────────────────────────────────────────────
-    // "private" significa que só esta classe pode acessar esses dados diretamente
-    private Produto[] produtos;         // Array que armazena todos os produtos cadastrados
-    private int total;                  // Quantidade de produtos atualmente cadastrados
+    public Produto[] produtos = new Produto[100];
+    public int total = 0;
 
-    // ─── CONSTRUTOR ───────────────────────────────────────────────────────────
-    /**
-     * Construtor: chamado quando criamos "new MenuReajustePreco(produtos,
-     * total)". Recebe os dados do MenuProduto para trabalhar no mesmo array,
-     * evitando dados duplicados ou desatualizados.
-     */
     public MenuReajustePreco(Produto[] produtos, int total) {
-        this.produtos = produtos;       // "this.produtos" = atributo da classe | "produtos" = parâmetro recebido
-        this.total = total;             // Mesma lógica para o total
+        this.produtos = produtos;
+        this.total = total;
     }
 
-    // ─── MENU PRINCIPAL ───────────────────────────────────────────────────────
-    /**
-     * Exibe o menu principal de reajuste em loop até o usuário escolher
-     * Retornar. Ponto de entrada chamado pelo Main ou pelo MenuProduto.
-     */
     public void menu() {
 
-        // Subrotina de validação: verifica se há produtos antes de qualquer ação
-        if (nenhumProdutoCadastrado()) {
-            return;                     // Encerra o método imediatamente se não há produtos
+        if (total == 0) {
+            JOptionPane.showMessageDialog(null,
+                    "Nenhum produto cadastrado!\n"
+                    + "Cadastre produtos antes de reajustar.");
+            return;
         }
 
-        String opcao;                   // Armazena a opção digitada pelo usuário
+        String opcao;
 
-        do {                            // do-while garante que o menu aparece pelo menos 1 vez
+        do {
             opcao = JOptionPane.showInputDialog(
                     "MENU REAJUSTE DE PREÇOS\n\n"
                     + "1 - Reajustar TODOS os produtos\n"
@@ -78,7 +62,7 @@ public class MenuReajustePreco {
             return;
         }
 
-                                // Monta prévia de resjuste
+        // Monta prévia de resjuste
         StringBuilder previa = new StringBuilder();
         previa.append("PRÉVIA DO REAJUSTE (").append(percentual).append("%)\n\n");
         previa.append(String.format("%-20s %10s  →  %10s%n", "PRODUTO", "ATUAL", "NOVO"));
@@ -102,7 +86,8 @@ public class MenuReajustePreco {
             JOptionPane.showMessageDialog(null, "Reajuste cancelado!");
         }
     }
-                                    // reajuste individual 
+    // reajuste individual 
+
     private void reajustarIndividual() {
         String novaAlteracao;
 
@@ -164,7 +149,8 @@ public class MenuReajustePreco {
 
         } while (novaAlteracao != null && novaAlteracao.equalsIgnoreCase("S"));
     }
-                        // Consulta de preços
+    // Consulta de preços
+
     private void consultarPrecos() {
         StringBuilder lista = new StringBuilder();
         lista.append("LISTA DE PREÇOS ATUAL\n\n");
