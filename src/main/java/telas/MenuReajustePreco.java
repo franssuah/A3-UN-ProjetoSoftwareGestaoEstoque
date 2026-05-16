@@ -3,14 +3,19 @@ package telas;       // Define que esta classe pertence ao pacote "telas"
 import modelo.Produto;                 // Importa a classe Produto do pacote modelo
 import javax.swing.JOptionPane;        // Importa o JOptionPane para criar janelas de diálogo
 
+/**
+ * Tela responsável pelo reajuste de preços dos produtos. Recebe o array de
+ * produtos e o total cadastrado do MenuProduto, garantindo que ambos trabalhem
+ * com os mesmos dados.
+ */
 public class MenuReajustePreco {
 
     public Produto[] produtos = new Produto[100];
     public int total = 0;
 
     public MenuReajustePreco(Produto[] produtos, int total) {
-        this.produtos = produtos;
-        this.total = total;
+        this.produtos = produtos;  // "this.produtos" = atributo da classe | "produtos" = parâmetro recebido
+        this.total = total;  // "this.total"    = atributo da classe | "total"    = parâmetro recebido
     }
 
     public void menu() {
@@ -22,9 +27,11 @@ public class MenuReajustePreco {
             return;
         }
 
-        String opcao;
+        String opcao; // Declara a variável que vai guardar o que o usuário digitar
 
+        // Inicia um loop que se repete indefinidamente até um "return" ou "break" interno
         do {
+            // Abre uma janela com campo de texto e retorna o que o usuário digitou
             opcao = JOptionPane.showInputDialog(
                     "MENU REAJUSTE DE PREÇOS\n\n"
                     + "1 - Reajustar TODOS os produtos\n"
@@ -33,10 +40,13 @@ public class MenuReajustePreco {
                     + "4 - Retornar\n\n"
                     + "Opção: "
             );
-
+            // Se o usuário clicou em "Cancelar" ou fechou a janela (X),
+            // showInputDialog retorna null — então encerramos o método
             if (opcao == null) {
                 return;
             }
+            // opcao.trim() remove espaços em branco no início e no fim do texto digitado
+            // O switch verifica qual opção foi digitada e chama o método correspondente
 
             switch (opcao.trim()) {
                 case "1" ->
@@ -55,9 +65,17 @@ public class MenuReajustePreco {
         } while (true);
     }
 
+    // =========================================================================
+    // MÉTODO REAJUSTAR TODOS — aplica reajuste em todos os produtos
+    // =========================================================================
+    // "private" = só pode ser chamado dentro desta própria classe
     private void reajustarTodos() {
+        // Chama o método auxiliar lerPercentual() para pedir e validar o percentual
+        // A string passada é o texto que aparece na janela de entrada
 
         double percentual = lerPercentual("REAJUSTE GERAL\n\nPercentual de reajuste (%): ");
+        // Double.MIN_VALUE é o código que lerPercentual() retorna quando o usuário cancela
+
         if (percentual == Double.MIN_VALUE) {
             return;
         }
