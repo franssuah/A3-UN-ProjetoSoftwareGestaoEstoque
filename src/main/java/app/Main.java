@@ -27,6 +27,17 @@ public class Main {
                     + "Opção: "
             );
 
+            // Bloco Condicional: Trava de Segurança para proteger contra NullPointerException.
+            
+            /* Resolve o problema no caso de o usuário clicar em "Cancelar", fechar a janela no "X"
+            ou pressionar "ESC", o JOptionPane retorna "null". O "break" atuará para identificar esta
+            ação e interromper o laço imediatamente, permitindo que a Máquina Virtual Java encerre o
+            método main() de forma operacional e controlada. */
+
+            if (opcao == null) {
+                break;
+            }
+            
             switch (opcao) {
                 case "1":
                     menuProduto.menu();
