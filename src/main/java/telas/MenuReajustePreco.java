@@ -1,13 +1,8 @@
-package telas;                          // Define que esta classe pertence ao pacote "telas"
+package telas;
 
-import modelo.Produto;                  // Importa a classe Produto do pacote modelo
-import javax.swing.JOptionPane;         // Importa o JOptionPane para criar janelas de diálogo
+import modelo.Produto;
+import javax.swing.JOptionPane;
 
-/**
- * Tela responsável pelo reajuste de preços dos produtos. Recebe o array de
- * produtos e o total cadastrado do MenuProduto, garantindo que ambos trabalhem
- * com os mesmos dados.
- */
 public class MenuReajustePreco {
 
     // ─── ATRIBUTOS ────────────────────────────────────────────────────────────
@@ -207,11 +202,11 @@ public class MenuReajustePreco {
         JOptionPane.showMessageDialog(null, lista.toString());
     }
 
-    // ═════════════════════════════════════════════════════════════════════════
-    //  SUBROTINAS AUXILIARES (utilitários reutilizados em vários métodos)
-    // ═════════════════════════════════════════════════════════════════════════
     /**
-     * SUBROTINA: Verifica se não há produtos cadastrados. Centraliza essa
+     * ═════════════════════════════════════════════════════════════════════════
+     * SUBROTINAS AUXILIARES (utilitários reutilizados em vários métodos)
+     * ═════════════════════════════════════════════════════════════════════════
+     * /** SUBROTINA: Verifica se não há produtos cadastrados. Centraliza essa
      * verificação para não repetir o mesmo bloco em todo lugar. Retorna true se
      * estiver vazio (e já exibe o aviso), false se houver produtos.
      */
