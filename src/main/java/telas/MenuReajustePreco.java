@@ -33,7 +33,7 @@ public class MenuReajustePreco {
             return;                     // Encerra o método imediatamente se não há produtos
         }
 
-        String opcao;                   // Armazena a opção digitada pelo usuário
+        String opcao;                   
 
         do {                            // do-while garante que o menu aparece pelo menos 1 vez
             opcao = JOptionPane.showInputDialog(
