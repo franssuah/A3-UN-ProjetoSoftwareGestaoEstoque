@@ -7,8 +7,8 @@ public class MenuReajustePreco {
 
     // ─── ATRIBUTOS ────────────────────────────────────────────────────────────
     // "private" significa que só esta classe pode acessar esses dados diretamente
-    private Produto[] produtos;         // Array que armazena todos os produtos cadastrados
-    private int total;                  // Quantidade de produtos atualmente cadastrados
+    private Produto[] produtos;         
+    private int total;                  
 
     // ─── CONSTRUTOR ───────────────────────────────────────────────────────────
     /**
@@ -17,8 +17,8 @@ public class MenuReajustePreco {
      * evitando dados duplicados ou desatualizados.
      */
     public MenuReajustePreco(Produto[] produtos, int total) {
-        this.produtos = produtos;       // "this.produtos" = atributo da classe | "produtos" = parâmetro recebido
-        this.total = total;             // Mesma lógica para o total
+        this.produtos = produtos;       
+        this.total = total;             
     }
 
     // ─── MENU PRINCIPAL ───────────────────────────────────────────────────────
