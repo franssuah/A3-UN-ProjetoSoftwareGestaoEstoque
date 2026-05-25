@@ -30,7 +30,7 @@ public class MenuReajustePreco {
 
         // Subrotina de validação: verifica se há produtos antes de qualquer ação
         if (nenhumProdutoCadastrado()) {
-            return;                     // Encerra o método imediatamente se não há produtos
+            return;                     
         }
 
         String opcao;                   
