@@ -112,16 +112,25 @@ public class MenuProduto {
                 produto.unidade = produto.unidade.trim().toUpperCase();
             }
 
-            // QUANTIDADE
+            // QUANTIDADE - Refatorado
             while (true) {
-                produto.quantidade = Integer.parseInt(
-                        JOptionPane.showInputDialog("QUANTIDADE: ")
-                );
-
-                if (produto.quantidade >= 0) {
-                    break;
+                // 1- Captura a entrada do usuário como texto puro.
+                String entradaQtd = JOptionPane.showInputDialog("INCLUSÃO DE PRODUTO\n\nQUANTIDADE: ");
+                
+                // 2- Delega a conversão e validação para a nossa classe utilitária.
+                int qtdValidada = util.ValidadorUtil.parseEValidarQuantidade(entradaQtd);
+                
+                // 3- Aplica a Regra de Negócio: -1 significa que o Validador encontrou um erro.
+                if (qtdValidada != -1) {
+                    produto.quantidade = qtdValidada; // Atualiza com o valor seguro.
+                    break; // Libera o usuário do ciclo de repetição.
                 } else {
-                    JOptionPane.showMessageDialog(null, "Quantidade deve ser maior ou igual a zero!");
+                    // 4- Feedback responsivo e educativo.
+                    JOptionPane.showMessageDialog(null, 
+                        "QUANTIDADE INVÁLIDA!\n" +
+                        "Por favor, introduza um número inteiro maior ou igual a zero.", 
+                        "Erro de Validação", 
+                        JOptionPane.ERROR_MESSAGE);
                 }
             }
 
@@ -185,16 +194,25 @@ public class MenuProduto {
 
                     produto.unidade = JOptionPane.showInputDialog("NOVA UNIDADE (KG, L, UN...): ");
 
+                    // NOVA QUANTIDADE - Refatorado
                     while (true) {
-                        int novaQtd = Integer.parseInt(
-                                JOptionPane.showInputDialog("NOVA QUANTIDADE: ")
-                        );
-                        if (novaQtd >= 0) {
-                            produto.quantidade = novaQtd;
+                        // 1- Captura a entrada do usuário como texto puro.
+                        String entradaNovaQtd = JOptionPane.showInputDialog("NOVA QUANTIDADE: ");
+                        
+                        // 2- Delega a conversão e validação.
+                        int qtdValidada = util.ValidadorUtil.parseEValidarQuantidade(entradaNovaQtd);
+                        
+                        // 3- Avalia o retorno do Validador.
+                        if (qtdValidada != -1) {
+                            produto.quantidade = qtdValidada;
                             break;
                         } else {
+                            // 4- Feedback de erro padrão.
                             JOptionPane.showMessageDialog(null,
-                                    "Quantidade deve ser maior ou igual a zero!");
+                                "QUANTIDADE INVÁLIDA!\n" +
+                                "Por favor, introduza um número inteiro maior ou igual a zero.",
+                                "Erro de Validação",
+                                JOptionPane.ERROR_MESSAGE);
                         }
                     }
 
