@@ -259,7 +259,7 @@ public class MenuProduto {
                         "Produto não encontrado!");
             }
             novaAlteracao = JOptionPane.showInputDialog("DESEJA FAZER UMA NOVA ALTERAÇÃO? (S/N)");
-        } while (novaAlteracao.equalsIgnoreCase("S"));
+        } while (novaAlteracao != null && novaAlteracao.equalsIgnoreCase("S"));
     }
 
     public void consultar() {

@@ -58,7 +58,6 @@ public class MenuRelatorio {
     }
 
     // SUB ROTINAS
-
     private void listaDePrecos() {
         StringBuilder lista = new StringBuilder(); // StringBuilder é a classe que permite a manipulação do valor da variável. / Aqui estamos pegando a variável lista e transformando em um objeto.
         lista.append("RELATÓRIO: LISTA DE PREÇOS\n\n"); // .append é um método que adiciona texto no final da string que está sendo construido.
