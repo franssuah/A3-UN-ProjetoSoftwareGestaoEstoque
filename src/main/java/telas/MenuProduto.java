@@ -79,18 +79,27 @@ public class MenuProduto {
                 }
             }
 
-            // PREÇO
+            // PREÇO - Refatorado
             while (true) {
-                produto.preco = Double.parseDouble(
-                        JOptionPane.showInputDialog("PREÇO: ")
-                );
+            // 1- Captura a entrada do usuário como texto puro sem tentar converter de imediato.
+            String entradaPreco = JOptionPane.showInputDialog("INCLUSÃO DE PRODUTO\n\nPREÇO: ");
 
-                if (produto.preco > 0) {
-                    break;
-                } else {
-                    JOptionPane.showMessageDialog(null, "Preço deve ser maior que zero!");
-                }
-            }
+            // 2- Delega a conversão e validação (abrange também contra letras, nulos e valores vazios).
+            double precoValidado = util.ValidadorUtil.parseEValidarPreco(entradaPreco);
+
+            // 3- Aplica a Regra de Negócio: -1.0 significa que o Validador interceptou um erro.
+                if (precoValidado != -1.0) {
+                produto.preco = precoValidado; // Atualiza o preço com um valor limpo e seguro.
+                    break; // Libera o usuário do ciclo de repetição.
+            } else {
+            // 4- Feedback responsivo informando como o usuário deve proceder de forma correta.
+            JOptionPane.showMessageDialog(null, 
+            "PREÇO INVÁLIDO!\n" +
+            "Por favor, introduza um valor numérico maior que zero (Ex: 10.50).", 
+            "Erro de Validação", 
+            JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
             // UNIDADE
             produto.unidade = JOptionPane.showInputDialog("UNIDADE (KG, L, UN...): ");
@@ -150,16 +159,27 @@ public class MenuProduto {
                             + "Quantidade: " + formatarUnidade(produto.unidade, produto.quantidade) + "\n"
                     );
 
+                    // NOVO PREÇO - Refatorado
                     while (true) {
-                        double novoPreco = Double.parseDouble(
-                                JOptionPane.showInputDialog("NOVO PREÇO: ")
-                        );
-                        if (novoPreco > 0) {
-                            produto.preco = novoPreco;
-                            break;
+                        
+                        // 1- Captura a entrada do usuário como texto puro sem tentar converter de imediato.
+                        String entradaNovoPreco = JOptionPane.showInputDialog("NOVO PREÇO: ");
+                            
+                        // 2- Delega a conversão e validação (abrange também contra letras, nulos e valores vazios).
+                        double precoValidado = util.ValidadorUtil.parseEValidarPreco(entradaNovoPreco);
+                        
+                        // 3- Aplica a Regra de Negócio: -1.0 significa que o Validador interceptou um erro.
+                        if (precoValidado != -1.0) {
+                            produto.preco = precoValidado; // Atualiza o preço com um valor limpo e seguro.
+                            break; // Libera o usuário do ciclo de repetição.
                         } else {
+                        
+                            // 4- Feedback responsivo informando como o usuário deve proceder de forma correta.
                             JOptionPane.showMessageDialog(null,
-                                    "Preço deve ser maior que zero!");
+                                "PREÇO INVÁLIDO!\n" +
+                                "Por favor, introduza um valor numérico maior que zero.",
+                                "Erro de Validação",
+                                JOptionPane.ERROR_MESSAGE);
                         }
                     }
 
