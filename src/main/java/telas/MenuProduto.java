@@ -56,26 +56,53 @@ public class MenuProduto {
         do {
             Produto produto = new Produto();
 
-            // NOME
+            // NOME - Refatorado com travas de segurança e validação de duplicidade
             while (true) {
-                produto.nome = JOptionPane.showInputDialog(
+                // 1- Captura a entrada interrompendo fechamentos acidentais da janela
+                String entradaNome = JOptionPane.showInputDialog(
                         "INCLUSÃO DE PRODUTO\n\nNOME: "
                 );
-                produto.nome = produto.nome.trim();
 
+                // Trava Nº 1: Prevenção contra NullPointerException. 
+                // Caso o usuário clicar em "Cancelar" ou fechar no "X", o método é abortado.
+                if (entradaNome == null) {
+                    return; 
+                }
+
+                // Remove espaços vazios acidentais antes e depois da palavra.
+                entradaNome = entradaNome.trim();
+
+                // Trava Nº 2: Impede o cadastro de produtos com o nome em branco.
+                if (entradaNome.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, 
+                            "NOME INVÁLIDO!\nO nome do produto não pode ficar em branco.", 
+                            "Erro de Validação", 
+                            JOptionPane.ERROR_MESSAGE);
+                    continue; // Retorna ao início do laço while para pedir novamente.
+                }
+
+                // Trava Nº 3: Regra de Negócio - Verificação de Duplicidade.
                 boolean existe = false;
-
+                
+                // Varre o vetor apenas até o limite de itens cadastrados (total), garantindo otimização.
                 for (int i = 0; i < total; i++) {
-                    if (produtos[i].nome.equalsIgnoreCase(produto.nome)) {
+                    // equalsIgnoreCase corrige situações onde "Maçã" e "maçã" são tratados como o mesmo item.
+                    if (produtos[i].nome.equalsIgnoreCase(entradaNome)) {
                         existe = true;
-                        break;
+                        break; // Encerra a busca imediatamente ao encontrar a primeira duplicata.
                     }
                 }
 
+                // Feedback responsivo de acordo com o resultado da busca.
                 if (existe) {
-                    JOptionPane.showMessageDialog(null, "Já existe um produto com este nome!");
+                    JOptionPane.showMessageDialog(null, 
+                            "PRODUTO DUPLICADO!\nJá existe um produto cadastrado com este nome.", 
+                            "Erro de Validação", 
+                            JOptionPane.WARNING_MESSAGE);
                 } else {
-                    break;
+                    // Passou em todas as validações: o nome é limpo, único e seguro para o sistema.
+                    produto.nome = entradaNome;
+                    break; // Libera o usuário do ciclo de repetição, avançando para a próxima etapa do cadastro.
                 }
             }
 
