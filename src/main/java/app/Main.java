@@ -13,6 +13,8 @@ public class Main {
 
         MenuProduto menuProduto = new MenuProduto();
         MenuMovimentacao menuMovimentacao = new MenuMovimentacao();
+        menuMovimentacao.produtos = menuProduto.produtos;
+        menuMovimentacao.total = menuProduto.total;
 
         String opcao;
 
@@ -43,7 +45,11 @@ public class Main {
                     menuProduto.menu();
                     break;
                 case "2":
-                   menuMovimentacao.menu();
+
+                    menuMovimentacao.produtos = menuProduto.produtos;
+                    menuMovimentacao.total = menuProduto.total;
+
+                    menuMovimentacao.menu();
                     break;
                 case "3":
                     new MenuReajustePreco(menuProduto.produtos, menuProduto.total).menu();
