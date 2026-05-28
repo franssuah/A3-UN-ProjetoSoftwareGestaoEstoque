@@ -161,28 +161,24 @@ public class MenuProduto {
                 }
             }
 
-            // CONFIRMACAO
-            // Confirmação com todos os dados do produto
-            String confirma = JOptionPane.showInputDialog(
-                    "─────────────────────────────────\n"
-                    + "      CONFIRMA A INCLUSÃO?\n"
-                    + "─────────────────────────────────\n\n"
-                    + "Nome      : " + produto.nome + "\n"
-                    + "Preço     : R$ " + String.format("%.2f", produto.preco) + "\n"
-                    + "Unidade   : " + produto.unidade + "\n"
-                    + "Quantidade: " + produto.quantidade + "\n\n"
-                    + "─────────────────────────────────\n"
-                    + "(S/N)"
-            );
+            // CONFIRMAÇÃO DE INCLUSÃO
+            // Substituição do formato de confirmação S/N pelo uso da sub-rotina gráfica traduzida.
+            String dadosLayout = "Nome      : " + produto.nome + "\n"
+                               + "Preço     : R$ " + String.format("%.2f", produto.preco) + "\n"
+                               + "Unidade   : " + produto.unidade + "\n"
+                               + "Quantidade: " + produto.quantidade;
 
-            if (confirma != null && confirma.equalsIgnoreCase("S")) {
+            if (mostrarDialogoConfirmacao(dadosLayout, "Confirmar Inclusão de Produto")) {
                 produtos[total] = produto;
                 total++;
-                JOptionPane.showMessageDialog(null,
-                        "Produto incluído com sucesso!");
+                JOptionPane.showMessageDialog(null, "Produto incluído com sucesso!");
+            } else {
+                JOptionPane.showMessageDialog(null, "Inclusão cancelada!");
             }
-            novaInclusao = JOptionPane.showInputDialog("NOVO INCLUSÃO DE PRODUTO? (S/N)");
-        } while (novaInclusao.equals("S"));
+         
+            // CONTROLE DE CICLO (INCLUIR)
+            // Uso da sub-rotina privada de ciclo para gerenciar a continuidade por botões nativos.
+        } while (mostrarDialogoCiclo("Deseja realizar uma nova inclusão de produto?"));
     }
 
     public void alterar() {
@@ -190,7 +186,8 @@ public class MenuProduto {
 
         do {
             String nome = JOptionPane.showInputDialog("ALTERAR PRODUTO\n\n DIGITE O NOME DO PRODUTO: ");
-
+            if (nome == null) break;
+            
             boolean existe = false;
 
             for (int i = 0; i < total; i++) {
@@ -252,9 +249,15 @@ public class MenuProduto {
                                     JOptionPane.ERROR_MESSAGE);
                         }
                     }
+                    
+                    // CONFIRMAÇÃO DE ALTERAÇÃO
+                    // Substituído o input manual de String pela validação lógica via caixa nativa.
+                    String dadosAlterados = "Confirmar as alterações para o produto '" + produto.nome + "'?\n\n"
+                                          + "Novo Preço     : R$ " + String.format("%.2f", produto.preco) + "\n"
+                                          + "Nova Unidade   : " + produto.unidade + "\n"
+                                          + "Nova Quantidade: " + produto.quantidade;
 
-                    String confirma = JOptionPane.showInputDialog("CONFIRMA ALTERAÇÃO? (S/N)");
-                    if (confirma.equalsIgnoreCase("S")) {
+                    if (mostrarDialogoConfirmacao(dadosAlterados, "Confirmação de Alteração")) {
                         JOptionPane.showMessageDialog(null, "Produto alterado com sucesso!");
                     } else {
                         JOptionPane.showMessageDialog(null, "Alteração cancelada!");
@@ -268,8 +271,10 @@ public class MenuProduto {
                 JOptionPane.showMessageDialog(null,
                         "Produto não encontrado!");
             }
-            novaAlteracao = JOptionPane.showInputDialog("DESEJA FAZER UMA NOVA ALTERAÇÃO? (S/N)");
-        } while (novaAlteracao != null && novaAlteracao.equalsIgnoreCase("S"));
+            
+            // CONTROLE DE CICLO (ALTERAR)
+            // Eliminação definitiva do input de texto (S/N) no fechamento do método alterar.
+            } while (mostrarDialogoCiclo("Deseja fazer uma nova alteração?"));
     }
 
     public void consultar() {
@@ -308,15 +313,12 @@ public class MenuProduto {
             if (!existe) {
                 JOptionPane.showMessageDialog(null, "Produto nao encontrado!");
             }
-
-            novaConsulta = JOptionPane.showInputDialog(
-                    "DESEJA FAZER UMA NOVA CONSULTA? (S/N)"
-            );
-
-        } while (novaConsulta != null && novaConsulta.equalsIgnoreCase("S"));
+            
+            // CONTROLE DE CICLO (CONSULTAR)
+            // Atualização da saída do fluxo consultivo de dados.
+            } while (mostrarDialogoCiclo("Deseja fazer uma nova consulta?"));
     }
 //  Formata a quantidade de acordo com a unidade
-
     private String formatarUnidade(String unidade, int quantidade) {
         switch (unidade.toUpperCase()) {
             case "KG":
@@ -389,61 +391,53 @@ public class MenuProduto {
                                 "Quantidade maior que o estoque!");
 
                     } else {
-
-                        String confirma = JOptionPane.showInputDialog(
-                                "CONFIRMA EXCLUSÃO DE "
-                                + quantidadeExcluir
-                                + " UNIDADE(S)? (S/N)"
-                        );
-
-                        if (confirma != null && confirma.equalsIgnoreCase("S")) {
-
-                            // REMOVE APENAS UMA PARTE
+                        
+                        // CONFIRMAÇÃO DE EXCLUSÃO
+                        // Diálogo binário nativo substituindo a antiga validação por digitação.
+                        String mensagemExclusao = "Deseja realmente remover " + quantidadeExcluir + " unidade(s) do produto '" + produto.nome + "'?";
+                        
+                        if (mostrarDialogoConfirmacao(mensagemExclusao, "Confirmação de Exclusão")) {
                             if (quantidadeExcluir < produto.quantidade) {
-
                                 produto.quantidade -= quantidadeExcluir;
-
-                                JOptionPane.showMessageDialog(null,
-                                        "Quantidade removida com sucesso!\n\n"
-                                        + "Estoque restante: "
-                                        + produto.quantidade
-                                );
-
-                            } // REMOVE O PRODUTO INTEIRO
-                            else {
-
+                                JOptionPane.showMessageDialog(null, "Quantidade removida com sucesso!\nEstoque restante: " + produto.quantidade);
+                            } else {
                                 for (int j = i; j < total - 1; j++) {
                                     produtos[j] = produtos[j + 1];
                                 }
-
                                 total--;
-
-                                JOptionPane.showMessageDialog(null,
-                                        "Produto removido completamente!");
+                                JOptionPane.showMessageDialog(null, "Produto removido completely do inventário!");
                             }
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Exclusão cancelada!");
                         }
                     }
-
                     existe = true;
                     break;
                 }
             }
 
             if (!existe) {
-
-                JOptionPane.showMessageDialog(null,
-                        "Produto não encontrado!");
-
+                JOptionPane.showMessageDialog(null, "Produto não encontrado!");
             }
+            
+            // CONTROLE DE CICLO (EXCLUIR)
+            // Fechamento do ciclo do menu de exclusão de estoque.
+            } while (mostrarDialogoCiclo("Deseja fazer uma nova exclusão?"));
+    }
 
-            novaExclusao = JOptionPane.showInputDialog(
-                    "DESEJA FAZER UMA NOVA EXCLUSÃO? (S/N)"
-            );
+    // IMPLEMENTAÇÃO DAS SUB-ROTINAS DE SUPORTE
+    // Métodos utilitários que gerenciam as chamadas do UIManager e os retornos do ConfirmDialog.
+    private boolean mostrarDialogoConfirmacao(String mensagem, String titulo) {
+        UIManager.put("OptionPane.yesButtonText", "Sim");
+        UIManager.put("OptionPane.noButtonText", "Não");
+        int resposta = JOptionPane.showConfirmDialog(null, mensagem, titulo, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        return resposta == JOptionPane.YES_OPTION;
+    }
 
-            if (novaExclusao == null) {
-                break;
-            }
-
-        } while (novaExclusao.equalsIgnoreCase("S"));
+    private boolean mostrarDialogoCiclo(String mensagem) {
+        UIManager.put("OptionPane.yesButtonText", "Sim");
+        UIManager.put("OptionPane.noButtonText", "Não");
+        int MathResposta = JOptionPane.showConfirmDialog(null, mensagem, "Continuar Operação", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        return MathResposta == JOptionPane.YES_OPTION;
     }
 }
