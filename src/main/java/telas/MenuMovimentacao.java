@@ -91,56 +91,82 @@ public class MenuMovimentacao {
                             + "Quantidade Atual: " + produto.quantidade
                     );
 
-                    int quantidadeEntrada;
+                    int quantidadeEntrada = 0;
 
-                    // VALIDA A QUANTIDADE
+                    // DESIGN PATTERN (FLUXO SEGURO): Consumo do utilitário centralizado de segurança
                     while (true) {
+                        String entradaQtd = JOptionPane.showInputDialog("QUANTIDADE DE ENTRADA:");
 
-                        try {
-
-                            quantidadeEntrada = Integer.parseInt(
-                                    JOptionPane.showInputDialog(
-                                            "QUANTIDADE DE ENTRADA:"
-                                    )
-                            );
-
-                            if (quantidadeEntrada > 0) {
-                                break;
-                            }
-
-                            JOptionPane.showMessageDialog(null,
-                                    "Digite uma quantidade válida!");
-
-                        } catch (NumberFormatException e) {
-
-                            JOptionPane.showMessageDialog(null,
-                                    "Digite apenas números!");
+                        if (entradaQtd == null) {
+                            JOptionPane.showMessageDialog(null, "Operação abortada!");
+                            return;
                         }
+
+                        int qtdValidada = util.ValidadorUtil.parseEValidarQuantidade(entradaQtd);
+
+                        if (qtdValidada == -1) {
+                            JOptionPane.showMessageDialog(null,
+                                    "QUANTIDADE INVÁLIDA!\n"
+                                    + "Por favor, introduza um número inteiro maior que zero.",
+                                    "Erro de Validação",
+                                    JOptionPane.ERROR_MESSAGE);
+                            continue;
+                        }
+                        
+                        if (qtdValidada == 0) {
+                            JOptionPane.showMessageDialog(null,
+                                    "A quantidade de entrada deve ser maior que zero!",
+                                    "Erro de Validação",
+                                    JOptionPane.WARNING_MESSAGE);
+                            continue;
+                        }
+
+                        quantidadeEntrada = qtdValidada;
+                        break;
                     }
 
-                    String confirma = JOptionPane.showInputDialog(
-                            "CONFIRMA ENTRADA?\n\n"
+                    // MELHORIA NA INTERFACE 1.0: Confirmação da Transação de Entrada via Botões Nativos.
+                    
+                    // Função Preditiva: Forçar os botões exibirem "Sim" e "Não" em vez de "Yes" e "No".
+                    /** Dependendo da configuração do sistema operacional do usuário há o risco de que a
+                    resposta do JOptionPane.showConfirmDialog adote seu padrão nativo (JVM) e mostre os
+                    botões em inglês ("Yes" e "No") em vez de pt-br ("Sim" e "Não"), quebrando o padrão
+                    da interface feita inteiramente em pt-br.
+                    */
+                    javax.swing.UIManager.put("OptionPane.yesButtonText", "Sim");
+                    javax.swing.UIManager.put("OptionPane.noButtonText", "Não");
+
+                    // CÁLCULO E PRÉVIA DA QUANTIDADE FINAL.
+                    int quantidadeFinalCalculada = produto.quantidade + quantidadeEntrada;
+
+                    String mensagemConfirmacao = "CONFIRMA A ENTRADA DE MATERIAL?\n\n"
                             + "Produto              : " + produto.nome + "\n"
                             + "Preço                : R$ " + String.format("%.2f", produto.preco) + "\n"
                             + "Unidade              : " + produto.unidade + "\n"
                             + "Quantidade a adicionar: " + quantidadeEntrada + "\n"
-                            + "Estoque atual        : " + produto.quantidade + "\n"
-                            + "Estoque após entrada : " + (produto.quantidade + quantidadeEntrada) + "\n\n"
-                            + "(S/N)"
+                            + "Estoque Atual        : " + produto.quantidade + "\n"
+                            + "🟢 QTDE FINAL (Saldo): " + quantidadeFinalCalculada + "\n\n"
+                            + "Deseja efetivar a transação no sistema?";
+
+                    // Interface de diálogo com botões em pt-br.
+                    int respostaBotao = JOptionPane.showConfirmDialog(
+                            null, 
+                            mensagemConfirmacao, 
+                            "Confirmação de Entrada", 
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE
                     );
 
-                    if (confirma != null && confirma.equalsIgnoreCase("S")) {
-                        produto.quantidade += quantidadeEntrada;
+                    // Validação binária da resposta do operador.
+                    if (respostaBotao == JOptionPane.YES_OPTION) {
+                        produto.quantidade = quantidadeFinalCalculada;
                         JOptionPane.showMessageDialog(null,
                                 "ENTRADA REALIZADA COM SUCESSO!\n\n"
                                 + "Produto    : " + produto.nome + "\n"
                                 + "Novo Estoque: " + produto.quantidade
                         );
-
                     } else {
-
-                        JOptionPane.showMessageDialog(null,
-                                "ENTRADA CANCELADA!");
+                        JOptionPane.showMessageDialog(null, "ENTRADA CANCELADA!");
                     }
 
                     existe = true;
@@ -154,13 +180,22 @@ public class MenuMovimentacao {
                         "Produto não encontrado!");
             }
 
-            novaEntrada = JOptionPane.showInputDialog(
-                    "DESEJA FAZER UMA NOVA ENTRADA? (S/N)"
+            // MELHORIA NA INTERFACE 1.1: Controle de Ciclo de Entrada Dedicado.
+            int respostaRepetir = JOptionPane.showConfirmDialog(
+                    null,
+                    "Deseja realizar uma nova entrada de produto?",
+                    "Continuar Operação",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
             );
 
-        } while (novaEntrada != null
-                && novaEntrada.equalsIgnoreCase("S"));
+            if (respostaRepetir != JOptionPane.YES_OPTION) {
+                break;
+            }
+
+        } while (true);
     }
+    
     public void saida() {
         // Sub-rotina de Segurança: Responsável em verificar se há produtos cadastrados no sistema antes mesmo de operar.
         if (total == 0) {
@@ -236,7 +271,7 @@ public class MenuMovimentacao {
                             continue;
                         }
 
-                        // TRAVA SEMÂNTICA: Proteção contra inconsistência física e estoque negativo.
+                        // TRAVA: Proteção contra inconsistência física e estoque negativo.
                         if (qtdValidada > produto.quantidade) {
                             JOptionPane.showMessageDialog(null,
                                     "ESTOQUE INSUFICIENTE!\n\n"
@@ -253,19 +288,32 @@ public class MenuMovimentacao {
                         }
                     }
 
-                    // Bloco de confirmação da transação física.
-                    String confirma = JOptionPane.showInputDialog(
-                            "CONFIRMA SAÍDA?\n\n"
+                    // MELHORIA NA INTERFACE 1.2: Confirmação da Transação de Saída via Botões Nativos.
+                    javax.swing.UIManager.put("OptionPane.yesButtonText", "Sim");
+                    javax.swing.UIManager.put("OptionPane.noButtonText", "Não");
+
+                    // CÁLCULO E PRÉVIA DA QUANTIDADE FINAL
+                    int quantidadeFinalCalculada = produto.quantidade - quantidadeSaida;
+
+                    String mensagemConfirmacao = "CONFIRMA A RETIRADA DE MATERIAL?\n\n"
                             + "Produto             : " + produto.nome + "\n"
                             + "Quantidade retirada : " + quantidadeSaida + "\n"
-                            + "Estoque atual       : " + produto.quantidade + "\n"
-                            + "Estoque após saída  : " + (produto.quantidade - quantidadeSaida) + "\n\n"
-                            + "(S/N)"
+                            + "Estoque Atual       : " + produto.quantidade + "\n"
+                            + "🔴 QTDE FINAL (Saldo): " + quantidadeFinalCalculada + "\n\n"
+                            + "Deseja efetivar a transação no sistema?";
+
+                    // Interface de diálogo com botões em pt-br.
+                    int respostaBotao = JOptionPane.showConfirmDialog(
+                            null, 
+                            mensagemConfirmacao, 
+                            "Confirmação de Saída", 
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE
                     );
 
-                    if (confirma != null && confirma.equalsIgnoreCase("S")) {
-                        produto.quantidade -= quantidadeSaida;
-
+                    // Validação binária da resposta do operador.
+                    if (respostaBotao == JOptionPane.YES_OPTION) {
+                        produto.quantidade = quantidadeFinalCalculada;
                         JOptionPane.showMessageDialog(null,
                                 "SAÍDA REALIZADA COM SUCESSO!\n\n"
                                 + "Novo estoque: " + produto.quantidade
@@ -273,18 +321,29 @@ public class MenuMovimentacao {
                     } else {
                         JOptionPane.showMessageDialog(null, "SAÍDA CANCELADA!");
                     }
-
+            
                     existe = true;
                     break;
                 }
             }
-            
+
             if (!existe) {
                 JOptionPane.showMessageDialog(null, "Produto não encontrado!");
             }
 
-            novaSaida = JOptionPane.showInputDialog("DESEJA FAZER UMA NOVA SAÍDA? (S/N)");
+            // MELHORIA NA INTERFACE 1.3: Controle de Ciclo de Saída Dedicado.
+            int respostaRepetir = JOptionPane.showConfirmDialog(
+                    null,
+                    "Deseja realizar uma nova saída de produto?",
+                    "Continuar Operação",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+            );
 
-        } while (novaSaida != null && novaSaida.equalsIgnoreCase("S"));
+            if (respostaRepetir != JOptionPane.YES_OPTION) {
+                break;
+            }
+
+        } while (true);
     }
 }
