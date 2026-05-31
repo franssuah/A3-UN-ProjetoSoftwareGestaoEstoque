@@ -120,39 +120,50 @@ public class MenuRelatorio {
     }
 
     private void balancoFisico() {
-        Produto[] produtosOrdenados = obterProdutosOrdenados();
-        StringBuilder relatorio = new StringBuilder();
-        relatorio.append("RELATÓRIO: BALANÇO FÍSICO\n\n");
-        relatorio.append(String.format("%-4s %-20s %-14s %-14s %-14s%n", "Nº", "PRODUTO", "PREÇO UN.", "QUANTIDADE", "TOTAL ITEM"));
-        relatorio.append("─".repeat(70)).append("\n");
-        
-        double totalGeral = 0; // Correção: Inicialização da variável local que estava faltando
-        
-        for (int i = 0; i < total; i++) {
-            double valorTotalItem = produtosOrdenados[i].preco * produtosOrdenados[i].quantidade;
-            totalGeral += valorTotalItem;
-
-        // Formatar o preço unitário e o total acumulado por item utilizando a sub-rotina.
-            String precoUnidadeFormatado = formatarParaMoedaReal(produtosOrdenados[i].preco);
-            String totalItemFormatado = formatarParaMoedaReal(valorTotalItem);
-            
-            String qtdComUnidade = formatarUnidade(produtosOrdenados[i].unidade, produtosOrdenados[i].quantidade);
-
-            relatorio.append(String.format("%-4d %-20s %-14s %-14s %-14s%n",
-                    i + 1, 
-                    produtosOrdenados[i].nome, 
-                    precoUnidadeFormatado,
-                    qtdComUnidade, 
-                    totalItemFormatado));
+        // Validação de Fluxo Preventiva: Impede que o relatório seja gerado caso o estoque esteja vazio.
+        if (total == 0) {
+            JOptionPane.showMessageDialog(null, 
+                    "Nenhum produto em estoque para gerar o Balanço Físico!", 
+                    "Aviso", JOptionPane.INFORMATION_MESSAGE);
+            return;
         }
         
-        String totalGeralFormatado = formatarParaMoedaReal(totalGeral);
+        // Obtém o vetor contendo as cópias das referências devidamente ordenadas de A a Z.
+        Produto[] produtosOrdenados = obterProdutosOrdenados();
+        
+        StringBuilder relatorio = new StringBuilder();
+        relatorio.append("==================================================================\n");
+        relatorio.append("                      BALANÇO FÍSICO DO ESTOQUE                   \n");
+        relatorio.append("==================================================================\n");
+        relatorio.append(String.format("%-25s | %-15s | %-15s\n", "PRODUTO", "UNIDADE", "QUANTIDADE"));
+        relatorio.append("------------------------------------------------------------------\n");
+        
+        // Variável Acumuladora: Inicia em zero para somar as unidades físicas do inventário.
+        int totalItensEstoque = 0;
+        
+        /** Laço de Repetição Linear: Varre o vetor temporário ordenado e utiliza-se da iteração
+        única para realizar o cálculo matemático da quantidade total de itens ativos.
+        */
+        for (int i = 0; i < total; i++) {
+            relatorio.append(String.format("%-25s | %-15s | %-15d\n",
+                    produtosOrdenados[i].nome,
+                    produtosOrdenados[i].unidade != null ? produtosOrdenados[i].unidade.toUpperCase() : "UN",
+                    produtosOrdenados[i].quantidade
+            ));
+            
+            totalItensEstoque += produtosOrdenados[i].quantidade;
+        }
+        
+        // Rodapé do Relatório: Adiciona uma linha divisória no rodapé.
+        relatorio.append("==================================================================\n");
+        relatorio.append(String.format("TOTAL DE ITEN NO ESTOQUE: \t\t\t %d unidades\n", totalItensEstoque));
+        relatorio.append("==================================================================");
 
-        relatorio.append("─".repeat(70)).append("\n");
-        relatorio.append(String.format("%-51s %-15s%n", "VALOR PATRIMONIAL TOTAL DO ESTOQUE:", totalGeralFormatado));
-        relatorio.append("Total de produtos cadastrados: ").append(total);
-
-        JOptionPane.showMessageDialog(null, relatorio.toString());
+        // Exibição da Interface para o usuário.
+        JOptionPane.showMessageDialog(null, 
+                relatorio.toString(), 
+                "Relatório - Balanço Físico", 
+                JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void balancoFinanceiro() {
@@ -169,7 +180,7 @@ public class MenuRelatorio {
             double valorTotal = produtosOrdenados[i].preco * produtosOrdenados[i].quantidade;
             totalGeral += valorTotal;
             
-            // Injeção do DecimalFormat para extinguir saídas cruas de ponto flutuante americano.
+            // Injeção do DecimalFormat para suprimir saídas cruas de ponto flutuante americano.
             String precoUnidadeFormatado = formatarParaMoedaReal(produtosOrdenados[i].preco);
             String totalItemFormatado = formatarParaMoedaReal(valorTotal);
             
