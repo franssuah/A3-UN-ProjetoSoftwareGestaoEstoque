@@ -4,6 +4,9 @@ import modelo.Produto; // Importando os dados armazenados na memória.
 import javax.swing.JOptionPane;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+// INCLUSÃO DOS IMPORTS TEMPORAIS DA API MODERN DO JAVA (JAVA 8+)
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class MenuRelatorio {
 
@@ -13,207 +16,155 @@ public class MenuRelatorio {
     public MenuRelatorio(Produto[] produtos, int total) {
         this.produtos = produtos;
         this.total = total;
+    }   
+        
+        /**
+        SUB-ROTINA AUXILIAR PRIVADA (ENCAPSULAMENTO)
+        Esta função se conecta com a API de tempo do sistema operacional via JVM, captura 
+        a data corrente e a formata sob o padrão regulatório nacional (dd/MM/yyyy).
+        Garante manutenibilidade centralizada: se o padrão mudar, altera-se apenas aqui.
+        */
+    private String obterDataFormatada() {
+        LocalDate dataAtual = LocalDate.now();
+        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return dataAtual.format(formatador);
     }
+    
         /**
         Este método clona o ponteiro referencial do array original de produtos ativos e 
         processa a ordenação alfabética (A-Z) em memória temporária. Atende ao requisito
-        sem bagunçar os índices físicos do estoque centralizado em MenuProduto, impedindo
-        a ocorrência de erros em outras telas.
+        sem bagunçar os índices físicos do estoque centralizado em MenuProduto e impede a
+        ocorrência de erros em outras telas.
         */
     private Produto[] obterProdutosOrdenados() {
-        // Passo Nº 1: Inicializar um vetor de tamanho idêntico ao total de cadastros válidos atuais.
         Produto[] vetorOrdenado = new Produto[this.total];
-        
-        // Passo Nº 2: Copiar as referências de objetos em um laço linear.
         for (int i = 0; i < this.total; i++) {
             vetorOrdenado[i] = this.produtos[i];
         }
 
-        // Passo Nº 3: Aplicação do Algoritmo Selection Sort.
         for (int i = 0; i < this.total - 1; i++) {
             int indiceMenor = i;
-            
-            // Laço secundário interno para varredura do restante do array em memória.
             for (int j = i + 1; j < this.total; j++) {
-                // Comparação de strings ignorando diferenças entre letras maiúsculas e minúsculas.
                 if (vetorOrdenado[j].nome.compareToIgnoreCase(vetorOrdenado[indiceMenor].nome) < 0) {
-                    indiceMenor = j; // Armazena o índice do menor elemento alfabético encontrado.
+                    indiceMenor = j;
                 }
             }
-            
-            // Mecanismo de Troca utilizando uma variável auxiliar de tipo de dado abstrato.
-            Produto temporario = vetorOrdenado[indiceMenor];
-            vetorOrdenado[indiceMenor] = vetorOrdenado[i];
-            vetorOrdenado[i] = temporario;
+            Produto aux = vetorOrdenado[i];
+            vetorOrdenado[i] = vetorOrdenado[indiceMenor];
+            vetorOrdenado[indiceMenor] = aux;
         }
-
-        return vetorOrdenado; // Retorna o array perfeitamente organizado de A a Z.
+        return vetorOrdenado;
     }
     
     public void menu() {
-
-        if (total == 0) {
+        if (this.total == 0) {
             JOptionPane.showMessageDialog(null,
-                    "Nenhum produto cadastrado!\n"
-                    + "Cadastre produtos antes de gerar relatórios."); // Ou seja, caso não tenha produto cadastrado, vai aparecer essas mensagens.
-            return; // Aqui o sistema vai direcionar para a tela 1.0.
+                    "SISTEMA DE ESTOQUE - RELATÓRIOS\n\n"
+                    + "Aviso: Não existem produtos cadastrados no inventário para emissão.", 
+                    "Relatório Vazio", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
         String opcao;
-
-        do { // Caso existir um produto ou mais, surgirá o menu de relatórios.
+        do {
             opcao = JOptionPane.showInputDialog(
-                    "MENU RELATÓRIOS\n\n"
-                    + "1 - Lista de Preços\n"
-                    + "2 - Balanço Físico\n"
-                    + "3 - Balanço Financeiro\n"
-                    + "4 - Retornar\n\n"
-                    + "Opção: "
+                    "EMISSÃO DE RELATÓRIOS GERENCIAIS\n\n"
+                    + "1 - Listagem de Preços (A-Z)\n"
+                    + "2 - Balanço Físico de Estoque\n"
+                    + "3 - Balanço Financeiro do Patrimônio\n"
+                    + "0 - Retornar ao Menu Principal\n\n"
+                    + "Selecione o relatório operacional:"
             );
 
-            if (opcao == null) { // Caso não coloque valor, retorna ao menu.
+            if (opcao == null) {
                 return;
             }
 
-            switch (opcao.trim()) { // Já que opcao é uma string, o .trim remove espaços em branco do início e do fim, evitando a quebra do sistema.
-
-                // Nas cases optei por usar -> (setinha) para não ter que utilziar o break, na minha opnião ficou mais bonito.
-                case "1" ->
-                    listaDePrecos();
-                case "2" ->
-                    balancoFisico();
-                case "3" ->
-                    balancoFinanceiro();
-                case "4" -> {
-                    return;
-                }
-                default ->
-                    JOptionPane.showMessageDialog(null, "Opção inválida!");
+            switch (opcao) {
+                case "1" -> listaDePrecos();
+                case "2" -> balancoFisico();
+                case "3" -> balancoFinanceiro();
+                case "0" -> { return; }
+                default -> JOptionPane.showMessageDialog(null, "Opção inválida! Tente novamente.");
             }
-
         } while (true);
     }
 
-    // SUB ROTINAS
     private void listaDePrecos() {
-        Produto[] produtosOrdenados = obterProdutosOrdenados();
-        StringBuilder lista = new StringBuilder(); // StringBuilder é a classe que permite a manipulação do valor da variável. / Aqui estamos pegando a variável lista e transformando em um objeto.
-        lista.append("RELATÓRIO: LISTA DE PREÇOS\n\n"); // .append é um método que adiciona texto no final da string que está sendo construido.
-        lista.append(String.format("%-4s %-20s %-10s %10s%n", "Nº", "PRODUTO", "UNIDADE", "PREÇO")); // formatação utilizada para que a janela se pareça com uma tabela.
-        lista.append("─".repeat(55)).append("\n"); // Ajustado para 55 repetições para alinhar com o novo espaçamento.
+        Produto[] ordenados = obterProdutosOrdenados();
+        StringBuilder sb = new StringBuilder();
+        
+        // SUBSTITUIÇÃO DO MARCADOR ESTÁTICO (99/99/99) PELA SUB-ROTINA AUXILIAR PRIVADA.
+        sb.append("EMPRESA LTDA. - RELATÓRIO DE PREÇOS\n");
+        sb.append("DATA DE EMISSÃO: ").append(obterDataFormatada()).append("\n");
+        sb.append("====================================================\n");
+        sb.append(String.format("%-25s %-15s %-15s\n", "NOME DO PRODUTO", "UNIDADE", "PREÇO UNITÁRIO"));
+        sb.append("----------------------------------------------------\n");
 
-        for (int i = 0; i < total; i++) {
-            // Formatação monetária profissional antes de exibir. Corrigido para dar append em "lista".
-            String precoFormatado = formatarParaMoedaReal(produtosOrdenados[i].preco);
-            
-            lista.append(String.format("%-4d %-25s %-12s %-15s%n",
-                    i + 1, 
-                    produtosOrdenados[i].nome, 
-                    produtosOrdenados[i].unidade != null ? produtosOrdenados[i].unidade.toUpperCase() : "UN",
-                    precoFormatado));
+        for (int i = 0; i < this.total; i++) {
+            sb.append(String.format("%-25s %-15s %-15s\n",
+                    ordenados[i].nome, 
+                    ordenados[i].unidade.toUpperCase(), 
+                    formatarParaMoedaReal(ordenados[i].preco)));
         }
+        sb.append("====================================================\n");
+        sb.append("Fim da listagem de preços.");
 
-        lista.append("─".repeat(60)).append("\n");
-        lista.append("Total de produtos: ").append(total);
-
-        JOptionPane.showMessageDialog(null, lista.toString());
+        JOptionPane.showMessageDialog(null, sb.toString(), "Relatório de Preços (A-Z)", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void balancoFisico() {
-        // Validação de Fluxo Preventiva: Impede que o relatório seja gerado caso o estoque esteja vazio.
-        if (total == 0) {
-            JOptionPane.showMessageDialog(null, 
-                    "Nenhum produto em estoque para gerar o Balanço Físico!", 
-                    "Aviso", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        
-        // Obtém o vetor contendo as cópias das referências devidamente ordenadas de A a Z.
-        Produto[] produtosOrdenados = obterProdutosOrdenados();
-        
-        StringBuilder relatorio = new StringBuilder();
-        relatorio.append("==================================================================\n");
-        relatorio.append("                      BALANÇO FÍSICO DO ESTOQUE                   \n");
-        relatorio.append("==================================================================\n");
-        relatorio.append(String.format("%-25s | %-15s | %-15s\n", "PRODUTO", "UNIDADE", "QUANTIDADE"));
-        relatorio.append("------------------------------------------------------------------\n");
-        
-        // Variável Acumuladora: Inicia em zero para somar as unidades físicas do inventário.
+        Produto[] ordenados = obterProdutosOrdenados();
+        StringBuilder sb = new StringBuilder();
         int totalItensEstoque = 0;
         
-        /** Laço de Repetição Linear: Varre o vetor temporário ordenado e utiliza-se da iteração
-        única para realizar o cálculo matemático da quantidade total de itens ativos.
-        */
-        for (int i = 0; i < total; i++) {
-            relatorio.append(String.format("%-25s | %-15s | %-15d\n",
-                    produtosOrdenados[i].nome,
-                    produtosOrdenados[i].unidade != null ? produtosOrdenados[i].unidade.toUpperCase() : "UN",
-                    produtosOrdenados[i].quantidade
-            ));
-            
-            totalItensEstoque += produtosOrdenados[i].quantidade;
+        // SUBSTITUIÇÃO DO MARCADOR ESTÁTICO (99/99/99) PELA SUB-ROTINA AUXILIAR PRIVADA.
+        sb.append("EMPRESA LTDA. - BALANÇO FÍSICO CENTRAL\n");
+        sb.append("DATA DE EMISSÃO: ").append(obterDataFormatada()).append("\n");
+        sb.append("====================================================\n");
+        sb.append(String.format("%-25s %-20s\n", "NOME DO PRODUTO", "QUANTIDADE EM ESTOQUE"));
+        sb.append("----------------------------------------------------\n");
+        
+        for (int i = 0; i < this.total; i++) {
+            sb.append(String.format("%-25s %-20s\n", 
+                    ordenados[i].nome, 
+                    formatarUnidade(ordenados[i].unidade, ordenados[i].quantidade)));
+            totalItensEstoque += ordenados[i].quantidade;
         }
         
-        // Rodapé do Relatório: Adiciona uma linha divisória no rodapé.
-        relatorio.append("==================================================================\n");
-        relatorio.append(String.format("TOTAL DE ITEN NO ESTOQUE: \t\t\t %d unidades\n", totalItensEstoque));
-        relatorio.append("==================================================================");
+        sb.append("====================================================\n");
+        sb.append("TOTAL DE ITENS NO ESTOQUE: ").append(totalItensEstoque).append(" unidades físicas.\n");
+        sb.append("====================================================\n");
 
-        // Exibição da Interface para o usuário.
-        JOptionPane.showMessageDialog(null, 
-                relatorio.toString(), 
-                "Relatório - Balanço Físico", 
-                JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(null, sb.toString(), "Balanço Físico de Estoque", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void balancoFinanceiro() {
-        // Garante a ordenação alfabética (A-Z) em memória temporária para exibição.
-        Produto[] produtosOrdenados = obterProdutosOrdenados(); // Mantendo a padronização de exibição ordenada.
+        Produto[] ordenados = obterProdutosOrdenados();
+        StringBuilder sb = new StringBuilder();
+        double valorTotalPatrimonio = 0.0;
         
-        StringBuilder relatorio = new StringBuilder();
-        relatorio.append("========================================================================\n");
-        relatorio.append("                      BALANÇO FINANCEIRO COMERCIAL                      \n");
-        relatorio.append("========================================================================\n\n");
-        relatorio.append(String.format("%-4s %-25s %-15s %-10s %-15s%n",
-                "Nº", "PRODUTO", "PREÇO UNIT.", "QTD", "VALOR TOTAL"));
-        relatorio.append("─".repeat(75)).append("\n");
+        // SUBSTITUIÇÃO DO MARCADOR ESTÁTICO (99/99/99) PELA SUB-ROTINA AUXILIAR PRIVADA.
+        sb.append("EMPRESA LTDA. - BALANÇO FINANCEIRO DE ATIVOS\n");
+        sb.append("DATA DE EMISSÃO: ").append(obterDataFormatada()).append("\n");
+        sb.append("====================================================\n");
+        sb.append(String.format("%-25s %-12s %-15s\n", "NOME DO PRODUTO", "SALDO FÍSICO", "VALOR TOTAL (R$)"));
+        sb.append("----------------------------------------------------\n");
         
-        // VARIÁVEL ACUMULADORA: Armazena o somatório do valor patrimonial total do estoque.
-        double totalGeral = 0;
-        
-        // Iteração linear sobre os dados ordenados para o cálculo e a montagem da tabela de saída.
-        for (int i = 0; i < total; i++) {
-            // Regra de Negócio: Realiza a multiplicação da quantidade física pelo preço unitário.
-            double valorTotal = produtosOrdenados[i].preco * produtosOrdenados[i].quantidade;
-            
-            // Acréscimo do acumulador financeiro geral do estoque.
-            totalGeral += valorTotal;
-            
-            // Injeção da sub-rotina DecimalFormat para conversão monetária PT-BR.
-            String precoUnidadeFormatado = formatarParaMoedaReal(produtosOrdenados[i].preco);
-            String totalItemFormatado = formatarParaMoedaReal(valorTotal);
-            
-            // Ligação estruturada com espaçamentos fixos e alinhados.
-            relatorio.append(String.format("%-4d %-25s %-15s %-10d %-15s%n",
-                    i + 1, 
-                    produtosOrdenados[i].nome, 
-                    precoUnidadeFormatado,
-                    produtosOrdenados[i].quantidade, 
-                    totalItemFormatado));
+        for (int i = 0; i < this.total; i++) {
+            double custoTotalProduto = ordenados[i].quantidade * ordenados[i].preco;
+            sb.append(String.format("%-25s %-12d %-15s\n", 
+                    ordenados[i].nome, 
+                    ordenados[i].quantidade, 
+                    formatarParaMoedaReal(custoTotalProduto)));
+            valorTotalPatrimonio += custoTotalProduto;
         }
         
-        // Conversão e formatação final do acumulador patrimonial total para exibição no rodapé do relatório.
-        String totalGeralFormatado = formatarParaMoedaReal(totalGeral);
-        
-        relatorio.append("─".repeat(75)).append("\n");
-        
-        // Exibição do valor total do patrimônio total.
-        relatorio.append(String.format("%-60s %-15s%n", "VALOR TOTAL DO ESTOQUE (PATRIMÔNIO):", totalGeralFormatado));
-        relatorio.append("─".repeat(75)).append("\n");
-        relatorio.append("Variedade de itens em estoque: ").append(total).append(" cadastros ativos.");
-        
-        // Renderização da interface em pop-up estável e informativo para o usuário.
-        JOptionPane.showMessageDialog(null, relatorio.toString(), "Balanço Financeiro", JOptionPane.INFORMATION_MESSAGE);
+        sb.append("====================================================\n");
+        sb.append("VALOR TOTAL DO ESTOQUE EM MOVIMENTO: ").append(formatarParaMoedaReal(valorTotalPatrimonio)).append("\n");
+        sb.append("====================================================\n");
+
+        JOptionPane.showMessageDialog(null, sb.toString(), "Balanço Financeiro - Patrimônio", JOptionPane.INFORMATION_MESSAGE);
     }
     
     /**
@@ -236,8 +187,7 @@ public class MenuRelatorio {
         // Blindagem contra NullPointerException caso a unidade não tenha sido informada.
         if (unidade == null) {
             return quantidade + " UN (Unidades)";
-        }
-        
+        }       
         switch (unidade.toUpperCase()) {
             case "KG" -> { return quantidade + " KG (Quilogramas)"; }
             case "G"  -> { return quantidade + " G (Gramas)"; }
@@ -246,7 +196,11 @@ public class MenuRelatorio {
             case "UN" -> { return quantidade + " UN (Unidades)"; }
             case "CX" -> { return quantidade + " CX (Caixas)"; }
             case "PC" -> { return quantidade + " PC (Pacotes)"; }
-            default   -> { return quantidade + " " + unidade; }
+            default   -> { return quantityFormatada(unidade, quantidade); }
         }
+    }
+    
+    private String quantityFormatada(String unidade, int quantidade) {
+        return quantidade + " " + unidade;
     }
 }
