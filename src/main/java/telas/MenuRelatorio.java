@@ -167,23 +167,33 @@ public class MenuRelatorio {
     }
 
     private void balancoFinanceiro() {
+        // Garante a ordenação alfabética (A-Z) em memória temporária para exibição.
         Produto[] produtosOrdenados = obterProdutosOrdenados(); // Mantendo a padronização de exibição ordenada.
+        
         StringBuilder relatorio = new StringBuilder();
-        relatorio.append("RELATÓRIO: BALANÇO FINANCEIRO COMERCIAL\n\n");
+        relatorio.append("========================================================================\n");
+        relatorio.append("                      BALANÇO FINANCEIRO COMERCIAL                      \n");
+        relatorio.append("========================================================================\n\n");
         relatorio.append(String.format("%-4s %-25s %-15s %-10s %-15s%n",
                 "Nº", "PRODUTO", "PREÇO UNIT.", "QTD", "VALOR TOTAL"));
-        relatorio.append("─".repeat(70)).append("\n");
-
+        relatorio.append("─".repeat(75)).append("\n");
+        
+        // VARIÁVEL ACUMULADORA: Armazena o somatório do valor patrimonial total do estoque.
         double totalGeral = 0;
-
+        
+        // Iteração linear sobre os dados ordenados para o cálculo e a montagem da tabela de saída.
         for (int i = 0; i < total; i++) {
+            // Regra de Negócio: Realiza a multiplicação da quantidade física pelo preço unitário.
             double valorTotal = produtosOrdenados[i].preco * produtosOrdenados[i].quantidade;
+            
+            // Acréscimo do acumulador financeiro geral do estoque.
             totalGeral += valorTotal;
             
-            // Injeção do DecimalFormat para suprimir saídas cruas de ponto flutuante americano.
+            // Injeção da sub-rotina DecimalFormat para conversão monetária PT-BR.
             String precoUnidadeFormatado = formatarParaMoedaReal(produtosOrdenados[i].preco);
             String totalItemFormatado = formatarParaMoedaReal(valorTotal);
             
+            // Ligação estruturada com espaçamentos fixos e alinhados.
             relatorio.append(String.format("%-4d %-25s %-15s %-10d %-15s%n",
                     i + 1, 
                     produtosOrdenados[i].nome, 
@@ -192,12 +202,18 @@ public class MenuRelatorio {
                     totalItemFormatado));
         }
         
+        // Conversão e formatação final do acumulador patrimonial total para exibição no rodapé do relatório.
         String totalGeralFormatado = formatarParaMoedaReal(totalGeral);
-        relatorio.append("─".repeat(70)).append("\n");
-        relatorio.append(String.format("%-51s %-15s%n", "TOTAL FINANCEIRO EM MOVIMENTO:", totalGeralFormatado));
-        relatorio.append("\nTotal de produtos: ").append(total);
-
-        JOptionPane.showMessageDialog(null, relatorio.toString());
+        
+        relatorio.append("─".repeat(75)).append("\n");
+        
+        // Exibição do valor total do patrimônio total.
+        relatorio.append(String.format("%-60s %-15s%n", "VALOR TOTAL DO ESTOQUE (PATRIMÔNIO):", totalGeralFormatado));
+        relatorio.append("─".repeat(75)).append("\n");
+        relatorio.append("Variedade de itens em estoque: ").append(total).append(" cadastros ativos.");
+        
+        // Renderização da interface em pop-up estável e informativo para o usuário.
+        JOptionPane.showMessageDialog(null, relatorio.toString(), "Balanço Financeiro", JOptionPane.INFORMATION_MESSAGE);
     }
     
     /**
