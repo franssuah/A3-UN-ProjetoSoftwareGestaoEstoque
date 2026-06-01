@@ -1,17 +1,29 @@
 package telas;
 
 import javax.swing.*;
-
 import modelo.Produto;
 
+/**
+ * Classe responsável pela gestão e interface gráfica do menu de produtos.
+ * Permite realizar as operações de inclusão, alteração, consulta e exclusão
+ * de itens no inventário através de diálogos gráficos.
+ * * @author Franssuah (Responsável Final - Versão Fork Individual)
+ */
 public class MenuProduto {
-
+    
+    // Vetor para armazenamento dos produtos cadastrados.
     public Produto[] produtos = new Produto[100];
+    
+    // Contador do total de produtos atualmente armazenados no vetor.
     public int total = 0;
-
+    
+    /**
+     * Exibe o menu principal de gerenciamento de produtos e gerencia o fluxo
+     * de chamadas para as sub-rotinas de CRUD com base na opção selecionada.
+     */
     public void menu() {
         String opcao;
-// Menu inicial
+        // Menu inicial
         do {
             opcao = JOptionPane.showInputDialog(
                     "Menu de Produtos\n"
@@ -43,7 +55,12 @@ public class MenuProduto {
             }
         } while (true);
     }
-
+    
+    /**
+     * Realiza a inclusão de um novo produto no inventário.
+     * Contém validações estritas contra valores em branco, duplicidade de nomes,
+     * preços inválidos, formatos de unidade e quantidades inconsistentes.
+     */
     public void incluir() {
 
         if (total == 100) {
@@ -180,7 +197,11 @@ public class MenuProduto {
             // Uso da sub-rotina privada de ciclo para gerenciar a continuidade por botões nativos.
         } while (mostrarDialogoCiclo("Deseja realizar uma nova inclusão de produto?"));
     }
-
+    
+    /**
+     * Localiza um produto cadastrado e permite a alteração segura de seus atributos
+     * (Preço, Unidade e Quantidade), impedindo a alteração direta de seu nome.
+     */
     public void alterar() {
         String novaAlteracao;
 
@@ -276,7 +297,11 @@ public class MenuProduto {
             // Eliminação definitiva do input de texto (S/N) no fechamento do método alterar.
             } while (mostrarDialogoCiclo("Deseja fazer uma nova alteração?"));
     }
-
+    
+    /**
+     * Consulta um produto cadastrado pelo nome, exibindo seus detalhes completos
+     * estruturados no layout de saída e com a unidade de medida devidamente formatada.
+     */
     public void consultar() {
         String novaConsulta;
         do {
@@ -318,7 +343,14 @@ public class MenuProduto {
             // Atualização da saída do fluxo consultivo de dados.
             } while (mostrarDialogoCiclo("Deseja fazer uma nova consulta?"));
     }
-//  Formata a quantidade de acordo com a unidade
+    
+    /**
+     * Formata a quantidade de acordo com a unidade de medida informada,
+     * adicionando a descrição legível correspondente em formato textual.
+     * * @param unidade A sigla da unidade de medida (ex: KG, L, UN).
+     * @param quantidade O valor inteiro da quantidade em estoque.
+     * @return Uma String contendo a quantidade concatenada à unidade por extenso.
+     */
     private String formatarUnidade(String unidade, int quantidade) {
         switch (unidade.toUpperCase()) {
             case "KG":
@@ -339,7 +371,12 @@ public class MenuProduto {
                 return quantidade + " " + unidade;
         }
     }
-
+    
+    /**
+     * Gerencia a exclusão total ou parcial de um produto do estoque.
+     * Caso o usuário remova o estoque remanescente por completo, os elementos posteriores
+     * do vetor são deslocados para manter a integridade estrutural do array linear.
+     */
     public void excluir() {
 
         String novaExclusao;
@@ -425,15 +462,25 @@ public class MenuProduto {
             } while (mostrarDialogoCiclo("Deseja fazer uma nova exclusão?"));
     }
 
-    // IMPLEMENTAÇÃO DAS SUB-ROTINAS DE SUPORTE
-    // Métodos utilitários que gerenciam as chamadas do UIManager e os retornos do ConfirmDialog.
+    /**
+     * Exibe uma interface gráfica de confirmação binária utilizando botões nativos.
+     * Configura temporariamente o texto dos botões do UIManager para "Sim" e "Não".
+     * * @param mensagem O texto descritivo a ser exibido no corpo do diálogo.
+     * @param titulo O título da janela de diálogo.
+     * @return true se o usuário clicar no botão "Sim", false caso contrário.
+     */
     private boolean mostrarDialogoConfirmacao(String mensagem, String titulo) {
         UIManager.put("OptionPane.yesButtonText", "Sim");
         UIManager.put("OptionPane.noButtonText", "Não");
         int resposta = JOptionPane.showConfirmDialog(null, mensagem, titulo, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         return resposta == JOptionPane.YES_OPTION;
     }
-
+    
+    /**
+     * Exibe uma interface de diálogo padronizado para controle de ciclos iterativos do sistema.
+     * * @param mensagem O texto de interrogação do ciclo a ser exibido ao usuário.
+     * @return true se o usuário desejar continuar a operação, false caso contrário.
+     */
     private boolean mostrarDialogoCiclo(String mensagem) {
         UIManager.put("OptionPane.yesButtonText", "Sim");
         UIManager.put("OptionPane.noButtonText", "Não");
