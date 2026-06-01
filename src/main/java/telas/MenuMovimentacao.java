@@ -1,14 +1,26 @@
 package telas;
 
 import javax.swing.JOptionPane;
-
 import modelo.Produto;
 
+/**
+ * Classe responsável por gerenciar a interface de movimentação de estoque.
+ * Fornece sub-rotinas controladas para entrada e saída de mercadorias,
+ * garantindo a integridade dos saldos armazenados em memória.
+ * * @author Franssuah (Responsável Final - Versão Fork Individual)
+ */
 public class MenuMovimentacao {
-
+    
+    // Vetor em memória contendo a lista de produtos cadastrados.
     public Produto[] produtos;
+    
+    // Contador que indica a quantidade total de produtos registrados no sistema.
     public int total;
-
+    
+    /**
+     * Exibe o menu principal de movimentação de estoque em ciclo contínuo.
+     * Permite ao operador selecionar entre fluxos de entrada, saída ou retorno.
+     */
     public void menu() {
 
         String opcao;
@@ -47,12 +59,17 @@ public class MenuMovimentacao {
 
         } while (true);
     }
-
+    
+    /**
+     * Gerencia a sub-rotina de entrada de produtos no estoque.
+     * Localiza o produto pelo nome de forma case-insensitive, valida a quantidade informada 
+     * através de utilitário de segurança e atualiza o saldo físico após confirmação expressa.
+     */
     public void entrada() {
 
         /*
-  * Método responsável pela entrada
-  * de produtos no estoque.
+         * Método responsável pela entrada
+         * de produtos no estoque.
          */
         if (total == 0) {
             JOptionPane.showMessageDialog(null,
@@ -196,6 +213,11 @@ public class MenuMovimentacao {
         } while (true);
     }
     
+    /**
+     * Gerencia a sub-rotina de saída e baixa de materiais no estoque.
+     * Valida se há saldo disponível em memória para impedir estoque negativo ou inconsistências,
+     * aplicando travas lógicas baseadas no estado atual do produto.
+     */
     public void saida() {
         // Sub-rotina de Segurança: Responsável em verificar se há produtos cadastrados no sistema antes mesmo de operar.
         if (total == 0) {
