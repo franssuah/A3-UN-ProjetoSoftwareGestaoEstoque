@@ -15,19 +15,27 @@ em lote (para mais de um produto), ou reajustes a 100% do estoque. O processo de
 atalhos em botões com valores pré-definidos ou permite ao usuário digitar outros valores. Ademais, a classe inclui
 validações preventivas para garantir que os reajustes a serem aplicados não fiquem negativos ou zerados, atendendo
 às regras de negócio.
-@author Franssuah (Responsável Técnico - Versão Fork Individual)
+@author Franssuah (Responsável Final - Versão Fork Individual)
 */
 public class MenuReajustePreco {
 
     private final Produto[] produtos;         
     private final int total;                  
-
+    
+    /**
+     * Construtor da classe MenuReajustePreco.
+     * * @param produtos Vetor contendo a referência dos produtos cadastrados no sistema.
+     * @param total    Quantidade atual de produtos ativos no inventário.
+     */
     public MenuReajustePreco(Produto[] produtos, int total) {
         this.produtos = produtos;       
         this.total = total;             
     }
 
-    // MENU INICIAL
+    /**
+     * Menu principal de reajuste de preços. Gerencia o fluxo de navegação entre
+     * reajuste coletivo, único ou total por meio de caixas de diálogo.
+     */
     public void menu() {
         if (nenhumProdutoCadastrado()) {
             return;                     
@@ -62,7 +70,10 @@ public class MenuReajustePreco {
         } while (true);
     }
 
-    // OPÇÃO Nº 1: REAJUSTE COLETIVO (VÁRIOS PRODUTOS DE UMA VEZ)
+    /**
+     * Realiza o reajuste coletivo selecionando múltiplos produtos específicos 
+     * através de busca textual exata e aplicando uma taxa percentual comum.
+     */
     private void reajustarColetivo() {
         // Vetor de booleanos para marcar quais índices do vetor principal serão reajustados.
         boolean[] marcados = new boolean[total];
@@ -156,7 +167,9 @@ public class MenuReajustePreco {
         }
     }
 
-    // OPÇÃO Nº 2: REAJUSTE ÚNICO (APENAS UM PRODUTO)
+    /**
+     * Realiza o reajuste de preço em apenas um produto localizado via nome exato.
+     */
     private void reajustarUnico() {
         String nomeBusca = JOptionPane.showInputDialog(null,
                 "REAJUSTE ÚNICO\n\nDigite o nome EXATO do produto:",
@@ -198,7 +211,10 @@ public class MenuReajustePreco {
         }
     }
 
-    // OPÇÃO Nº 3: REAJUSTE TOTAL (TODOS OS PRODUTOS DO ESTOQUE)
+    /**
+     * Aplica uma alteração de preço uniforme a todos os produtos ativos do estoque,
+     * impedindo ações de descontos em massa iguais ou superiores a 100%.
+     */
     private void reajustarTotal() {
         Boolean modoAumento = escolherModoReajuste("REAJUSTE TOTAL DO ESTOQUE");
         if (modoAumento == null) return;
@@ -249,7 +265,14 @@ public class MenuReajustePreco {
         }
     }
 
-    // SUB-ROTINA - INTERFACE INTELIGENTE COM ATALHOS
+    /**
+     * Interface gráfica interativa para capturar a porcentagem de reajuste por meio
+     * de botões de atalho rápido (+/- 10%, 25%, 50%) ou digitação manual em caixa de texto.
+     * * @param titulo        Título customizado da janela de diálogo.
+     * @param ehAumento     Sinalizador lógico indicando se é aumento (true) ou redução (false).
+     * @param precoContexto Preço atual do item em edição (usado para validações preventivas em tempo real).
+     * @return O percentual validado positivo extraído, ou Double.MIN_VALUE se a ação for abortada.
+     */
     private double executarInterfaceInteligente(String titulo, boolean ehAumento, double precoContexto) {
         JTextField campoPercentual = new JTextField(10);
         JPanel painelMensagem = new JPanel();
@@ -335,7 +358,12 @@ public class MenuReajustePreco {
         }
     }
 
-    // SELEÇÃO DO TIPO DE REAJUSTE (AUMENTO OU REDUÇÃO)
+    /**
+     * Define dinamicamente as legendas dos botões de resposta rápida e captura se
+     * o usuário deseja realizar um aumento (+) ou uma redução (-).
+     * * @param titulo Título de cabeçalho contextual da caixa de opções.
+     * @return Boolean indicando true se for aumento, false se for redução, ou null caso cancelado.
+     */
     private Boolean escolherModoReajuste(String titulo) {
         javax.swing.UIManager.put("OptionPane.yesButtonText", "AUMENTO (+)");
         javax.swing.UIManager.put("OptionPane.noButtonText", "REDUÇÃO (-)");
@@ -349,7 +377,14 @@ public class MenuReajustePreco {
         if (resposta == JOptionPane.CLOSED_OPTION) return null;
         return resposta == JOptionPane.YES_OPTION;
     }
-
+    
+    /**
+     * Apresenta o sumário/relatório descritivo prévio das alterações de preço e
+     * solicita a confirmação final da gravação de dados em memória.
+     * * @param conteudo Corpo textual estruturado com a prévia das alterações.
+     * @param titulo   Título descritivo da janela de aviso.
+     * @return Retorna true caso o usuário aprove a transação, false se rejeitada.
+     */
     private boolean confirmarTransacao(String conteudo, String titulo) {
         javax.swing.UIManager.put("OptionPane.yesButtonText", "Sim, Confirmar e Salvar");
         javax.swing.UIManager.put("OptionPane.noButtonText", "Não, Cancelar Operação");
@@ -361,7 +396,13 @@ public class MenuReajustePreco {
                 JOptionPane.WARNING_MESSAGE);
         return resposta == JOptionPane.YES_OPTION;
     }
-
+    
+    /**
+     * Localiza linearmente o índice de um produto correspondente no array a partir
+     * de uma busca de texto insensível a maiúsculas/minúsculas.
+     * * @param nome Nome textual exato do produto desejado.
+     * @return O índice inteiro do produto caso seja encontrado, ou -1 caso contrário.
+     */
     private int localizarIndiceProdutoExato(String nome) {
         for (int i = 0; i < total; i++) {
             if (produtos[i].nome.equalsIgnoreCase(nome)) {
@@ -370,7 +411,12 @@ public class MenuReajustePreco {
         }
         return -1;
     }
-
+    
+    /**
+     * Validação interna que verifica o estado atual do inventário impedindo que
+     * rotinas operem sobre vetores vazios.
+     * * @return true se o estoque contiver zero registros ativos, false caso existam itens.
+     */
     private boolean nenhumProdutoCadastrado() {
         if (total == 0) {
             JOptionPane.showMessageDialog(null,
@@ -380,7 +426,13 @@ public class MenuReajustePreco {
         }
         return false;
     }
-
+    
+    /**
+     * Realiza o cálculo aritmético direto de reajuste percentual sobre um preço base.
+     * * @param precoAtual Preço original do item sob o qual o fator incidirá.
+     * @param percentual Índice de reajuste (valores positivos aumentam, negativos decrementam).
+     * @return O novo preço calculado resultante.
+     */
     private double calcularNovoPreco(double precoAtual, double percentual) {
         return precoAtual * (1 + percentual / 100.0);
     }
