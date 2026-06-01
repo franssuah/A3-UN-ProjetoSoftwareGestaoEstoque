@@ -8,22 +8,36 @@ import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Classe responsável pela geração e exibição dos relatórios gerenciais do sistema.
+ * Apresenta opções de listagem de preços ordenada, balanço físico e balanço financeiro.
+ * * @author Franssuah (Responsável Final - Versão Fork Individual)
+ */
 public class MenuRelatorio {
-
+    
+    // Array que armazena a referência dos produtos do inventário.
     public Produto[] produtos = new Produto[100];
+    
+    // Contador do total de produtos cadastrados.
     public int total = 0;
-
+    
+    /**
+     * Construtor da classe MenuRelatorio.
+     * * @param produtos Array de produtos ativos na memória.
+     * @param total Quantidade total de itens cadastrados no vetor.
+     */
     public MenuRelatorio(Produto[] produtos, int total) {
         this.produtos = produtos;
         this.total = total;
     }   
         
-        /**
-        SUB-ROTINA AUXILIAR PRIVADA (ENCAPSULAMENTO)
-        Esta função se conecta com a API de tempo do sistema operacional via JVM, captura 
-        a data corrente e a formata sob o padrão regulatório nacional (dd/MM/yyyy).
-        Garante manutenibilidade centralizada: se o padrão mudar, altera-se apenas aqui.
-        */
+    /**
+     * SUB-ROTINA AUXILIAR PRIVADA (ENCAPSULAMENTO)
+     * Esta função se conecta com a API de tempo do sistema operacional via JVM, captura 
+     * a data corrente e a formata sob o padrão regulatório nacional (dd/MM/yyyy).
+     * Garante manutenibilidade centralizada: se o padrão mudar, altera-se apenas aqui.
+     * * @return String contendo a data atual formatada.
+     */
     private String obterDataFormatada() {
         LocalDate dataAtual = LocalDate.now();
         DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -31,17 +45,19 @@ public class MenuRelatorio {
     }
     
         /**
-        Este método clona o ponteiro referencial do array original de produtos ativos e 
-        processa a ordenação alfabética (A-Z) em memória temporária. Atende ao requisito
-        sem bagunçar os índices físicos do estoque centralizado em MenuProduto e impede a
-        ocorrência de erros em outras telas.
-        */
+         * Este método clona o ponteiro referencial do array original de produtos ativos e 
+         * processa a ordenação alfabética (A-Z) em memória temporária. Atende ao requisito
+         * sem bagunçar os índices físicos do estoque centralizado em MenuProduto e impede a
+         * ocorrência de erros em outras telas.
+         * * @return Array de objetos Produto ordenados alfabeticamente pelo nome.
+         */
     private Produto[] obterProdutosOrdenados() {
         Produto[] vetorOrdenado = new Produto[this.total];
         for (int i = 0; i < this.total; i++) {
             vetorOrdenado[i] = this.produtos[i];
         }
-
+        
+        // Algoritmo de ordenação por seleção (Bubble/Selection) em memória temporária.
         for (int i = 0; i < this.total - 1; i++) {
             int indiceMenor = i;
             for (int j = i + 1; j < this.total; j++) {
@@ -56,6 +72,7 @@ public class MenuRelatorio {
         return vetorOrdenado;
     }
     
+    // Exibe o menu interativo de opções de relatórios operacionais e gerencia a navegação.
     public void menu() {
         if (this.total == 0) {
             JOptionPane.showMessageDialog(null,
@@ -89,7 +106,8 @@ public class MenuRelatorio {
             }
         } while (true);
     }
-
+    
+    // Gera e exibe o relatório estruturado da listagem de preços em ordem alfabética.
     private void listaDePrecos() {
         Produto[] ordenados = obterProdutosOrdenados();
         StringBuilder sb = new StringBuilder();
@@ -112,7 +130,8 @@ public class MenuRelatorio {
 
         JOptionPane.showMessageDialog(null, sb.toString(), "Relatório de Preços (A-Z)", JOptionPane.INFORMATION_MESSAGE);
     }
-
+    
+    // Gera e exibe o relatório do balanço físico do estoque central.
     private void balancoFisico() {
         Produto[] ordenados = obterProdutosOrdenados();
         StringBuilder sb = new StringBuilder();
@@ -138,7 +157,8 @@ public class MenuRelatorio {
 
         JOptionPane.showMessageDialog(null, sb.toString(), "Balanço Físico de Estoque", JOptionPane.INFORMATION_MESSAGE);
     }
-
+    
+    // Gera e exibe o relatório de balanço financeiro com o valor total do patrimônio em estoque.
     private void balancoFinanceiro() {
         Produto[] ordenados = obterProdutosOrdenados();
         StringBuilder sb = new StringBuilder();
@@ -168,11 +188,13 @@ public class MenuRelatorio {
     }
     
     /**
-    Sub-rotina utilitária e privada para centralizar a formatação de valores monetários.
-    Utiliza a infraestrutura DecimalFormat e força os padrões comerciais brasileiros (PT-BR),
-    garantindo que pontos separem milhares e vírgulas separem centavos independentemente do
-    Local ou Sistema Operacional. Posicionada corretamente como membro isolado da classe.
-    */
+     * Sub-rotina utilitária e privada para centralizar a formatação de valores monetários.
+     * Utiliza a infraestrutura DecimalFormat e força os padrões comerciais brasileiros (PT-BR),
+     * garantindo que pontos separem milhares e vírgulas separem centavos independentemente do
+     * Local ou Sistema Operacional.
+     * * @param valor O montante numérico double a ser formatado.
+     * @return String formatada contendo o símbolo R$ e as divisões brasileiras.
+     */
     private String formatarParaMoedaReal(double valor) {
         DecimalFormatSymbols simbolos = new DecimalFormatSymbols();
         simbolos.setGroupingSeparator('.');
@@ -183,6 +205,12 @@ public class MenuRelatorio {
         return "R$ " + formatador.format(valor);
     }
     
+    /**
+     * Realiza o tratamento estético das unidades de medida baseando-se em suas siglas.
+     * * @param unidade Sigla representativa da unidade de medida.
+     * @param quantidade Quantidade física atual em estoque.
+     * @return String esteticamente amigável com a descrição por extenso integrada.
+     */
     private String formatarUnidade(String unidade, int quantidade) {
         // Blindagem contra NullPointerException caso a unidade não tenha sido informada.
         if (unidade == null) {
@@ -200,6 +228,12 @@ public class MenuRelatorio {
         }
     }
     
+    /**
+     * Formata saídas genéricas de unidades de medida customizadas não catalogadas no switch.
+     * * @param unidade Nome ou sigla da unidade customizada.
+     * @param quantidade Quantidade de itens.
+     * @return String concatenando quantidade e unidade informada.
+     */
     private String quantityFormatada(String unidade, int quantidade) {
         return quantidade + " " + unidade;
     }
