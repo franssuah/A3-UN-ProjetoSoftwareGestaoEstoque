@@ -10,6 +10,14 @@
 > **Instituição:** Universidade do Sul de Santa Catarina (UNISUL)  
 > **Professor:** Ricardo Ribeiro Assink
 
+### Relatório Técnico
+
+A versão completa e detalhada do relatório acadêmico está disponível para consulta:
+
+<a href="https://drive.google.com/file/d/1advSxyIrl3S8O2MV86wSc6_2p3VVnUwi/view?usp=sharing">
+  <img src="https://img.shields.io/badge/Google Drive-PDF-red?style=flat&logo=googledrive&logoColor=white&labelColor=555555" height="90">
+</a>
+
 ### Objetivo A3
 
 Projetar um software funcional dedicado a atender necessidades cotidianas e logísticas de empresas voltadas para o comércio utilizando estritamente a linguagem `Java`.
